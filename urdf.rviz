@@ -8,6 +8,7 @@ Panels:
         - /Status1
         - /RobotModel1
         - /Axes1
+        - /Range1
       Splitter Ratio: 0.5
     Tree Height: 565
   - Class: rviz/Selection
@@ -62,16 +63,50 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        head_Link:
+        ardrone1_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        uav_base:
+        ardrone2_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
+        ardrone3_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        head_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        robot1_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        robot2_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        robot3_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        uav_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        world:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
       Name: RobotModel
       Robot Description: robot_description
       TF Prefix: ""
@@ -84,6 +119,16 @@ Visualization Manager:
       Name: Axes
       Radius: 0.0199999996
       Reference Frame: <Fixed Frame>
+      Value: true
+    - Alpha: 0.100000001
+      Buffer Length: 1
+      Class: rviz/Range
+      Color: 85; 255; 255
+      Enabled: true
+      Name: Range
+      Queue Size: 100
+      Topic: /view_field
+      Unreliable: false
       Value: true
   Enabled: true
   Global Options:
@@ -110,25 +155,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 2.88001227
+      Distance: 9.56573296
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.148227364
-        Y: -0.145285755
-        Z: 0.152965739
+        X: 0.124904007
+        Y: 0.143038973
+        Z: 0.293367088
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 1.10539854
+      Pitch: 1.01039863
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 4.533566
+      Yaw: 3.88355947
     Saved: ~
 Window Geometry:
   Displays:
@@ -146,5 +191,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1381
-  X: 340
-  Y: 91
+  X: 2090
+  Y: 134

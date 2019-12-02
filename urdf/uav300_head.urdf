@@ -121,6 +121,63 @@
     <safety_controller
       k_velocity="0" />
   </joint>
+  <link
+    name="view_link">
+    <inertial>
+      <origin
+        xyz="0.00033386993075224 0.0766238028035832 0.00364568473062213"
+        rpy="0 0 0" />
+      <mass
+        value="0.399880166519623" />
+      <inertia
+        ixx="0.00219861258298517"
+        ixy="3.88185570049305E-06"
+        ixz="2.77670680958347E-07"
+        iyy="0.00323868605686356"
+        iyz="-2.49466975116949E-05"
+        izz="0.00190812327495004" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0.144"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://uav300_head/meshes/view_field.stl" 
+          scale="1 1 1"/>
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.352941176470588 0.552941176470588 0.752941176470588 0.2" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://uav300_head/meshes/view_field.stl" 
+          scale="1 1 1"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="view_joint"
+    type="fixed">
+    <origin
+      xyz="0 0 0"
+      rpy="0 0 0" />
+    <parent
+      link="head_link" />
+    <child
+      link="view_link" />
+    <axis
+      xyz="0 0 1" />
+    <safety_controller
+      k_velocity="0" />
+  </joint>
 
 
 
