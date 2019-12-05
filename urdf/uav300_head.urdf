@@ -149,7 +149,7 @@
       <material
         name="">
         <color
-          rgba="0.352941176470588 0.552941176470588 0.752941176470588 0.2" />
+          rgba="0.352941176470588 0.552941176470588 0.752941176470588 0.3" />
       </material>
     </visual>
     <collision>
@@ -181,6 +181,64 @@
 
 
 
+
+  <link
+    name="ardrone0_link">
+    <inertial>
+      <origin
+        xyz="0.014599427663741 0.0724676211418231 0.550589552982637"
+        rpy="0 0 0" />
+      <mass
+        value="0.399880166519623" />
+      <inertia
+        ixx="0.00190812327495004"
+        ixy="2.49466975116951E-05"
+        ixz="2.77670680958346E-07"
+        iyy="0.00323868605686356"
+        iyz="-3.88185570049305E-06"
+        izz="0.00219861258298517" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0.05"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://uav300_head/meshes/Drone_2.0_Complete_Indoor_02.STL" 
+          scale="0.001 0.001 0.001"/> 
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.252941176470588 0.452941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://uav300_head/meshes/Drone_2.0_Complete_Indoor_02.STL" 
+          scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="ardrone0_joint"
+    type="fixed">
+    <origin
+      xyz="1000 1000 0"
+      rpy="0 0 0" />
+    <parent
+      link="world" />
+    <child
+      link="ardrone0_link" />
+    <axis
+      xyz="0 0 0" />
+    <safety_controller
+      k_velocity="0" />
+  </joint>
 
   <link
     name="ardrone1_link">
@@ -298,8 +356,11 @@
       k_velocity="0" />
   </joint>
 
+
+
+
   <link
-    name="ardrone3_link">
+    name="person0_link">
     <inertial>
       <origin
         xyz="0.014599427663741 0.0724676211418231 0.550589552982637"
@@ -316,68 +377,7 @@
     </inertial>
     <visual>
       <origin
-        xyz="0 0 0.05"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://uav300_head/meshes/Drone_2.0_Complete_Indoor_02.STL" 
-          scale="0.001 0.001 0.001"/> 
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.752941176470588 0.252941176470588 0.452941176470588 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://uav300_head/meshes/Drone_2.0_Complete_Indoor_02.STL" 
-          scale="0.001 0.001 0.001"/>
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="ardrone3_joint"
-    type="fixed">
-    <origin
-      xyz="1000 1000 0"
-      rpy="0 0 0" />
-    <parent
-      link="world" />
-    <child
-      link="ardrone3_link" />
-    <axis
-      xyz="0 0 0" />
-    <safety_controller
-      k_velocity="0" />
-  </joint>
-
-
-
-
-  <link
-    name="robot1_link">
-    <inertial>
-      <origin
-        xyz="0.014599427663741 0.0724676211418231 0.550589552982637"
-        rpy="0 0 0" />
-      <mass
-        value="0.399880166519623" />
-      <inertia
-        ixx="0.00190812327495004"
-        ixy="2.49466975116951E-05"
-        ixz="2.77670680958346E-07"
-        iyy="0.00323868605686356"
-        iyz="-3.88185570049305E-06"
-        izz="0.00219861258298517" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0.7"
+        xyz="0 0 0.1"
         rpy="1.5704 0 0" />
       <geometry>
         <mesh
@@ -402,7 +402,7 @@
     </collision>
   </link>
   <joint
-    name="robot1_joint"
+    name="person0_joint"
     type="fixed">
     <origin
       xyz="1000 1000 0"
@@ -410,7 +410,7 @@
     <parent
       link="world" />
     <child
-      link="robot1_link" />
+      link="person0_link" />
     <axis
       xyz="0 0 0" />
     <safety_controller
@@ -418,7 +418,7 @@
   </joint>
 
    <link
-    name="robot2_link">
+    name="person1_link">
     <inertial>
       <origin
         xyz="0.014599427663741 0.0724676211418231 0.550589552982637"
@@ -435,7 +435,7 @@
     </inertial>
     <visual>
       <origin
-        xyz="0 0 0.7"
+        xyz="0 0 0.1"
         rpy="1.5704 0 0" />
       <geometry>
         <mesh
@@ -460,7 +460,7 @@
     </collision>
   </link>
   <joint
-    name="robot2_joint"
+    name="person1_joint"
     type="fixed">
     <origin
       xyz="1000 1000 0"
@@ -468,7 +468,7 @@
     <parent
       link="world" />
     <child
-      link="robot2_link" />
+      link="person1_link" />
     <axis
       xyz="0 0 0" />
     <safety_controller
@@ -476,7 +476,7 @@
   </joint>
 
    <link
-    name="robot3_link">
+    name="person2_link">
     <inertial>
       <origin
         xyz="0.014599427663741 0.0724676211418231 0.550589552982637"
@@ -493,7 +493,7 @@
     </inertial>
     <visual>
       <origin
-        xyz="0 0 0.7"
+        xyz="0 0 0.1"
         rpy="1.5704 0 0" />
       <geometry>
         <mesh
@@ -518,7 +518,7 @@
     </collision>
   </link>
   <joint
-    name="robot3_joint"
+    name="person2_joint"
     type="fixed">
     <origin
       xyz="1000 1000 0"
@@ -526,7 +526,7 @@
     <parent
       link="world" />
     <child
-      link="robot3_link" />
+      link="person2_link" />
     <axis
       xyz="0 0 0" />
     <safety_controller
