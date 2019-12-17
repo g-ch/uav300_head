@@ -183,7 +183,7 @@
 
 
   <link
-    name="ardrone0_link">
+    name="drone0_link">
     <inertial>
       <origin
         xyz="0.014599427663741 0.0724676211418231 0.550589552982637"
@@ -225,7 +225,7 @@
     </collision>
   </link>
   <joint
-    name="ardrone0_joint"
+    name="drone0_joint"
     type="fixed">
     <origin
       xyz="1000 1000 0"
@@ -233,7 +233,7 @@
     <parent
       link="world" />
     <child
-      link="ardrone0_link" />
+      link="drone0_link" />
     <axis
       xyz="0 0 0" />
     <safety_controller
@@ -241,7 +241,7 @@
   </joint>
 
   <link
-    name="ardrone1_link">
+    name="drone1_link">
     <inertial>
       <origin
         xyz="0.014599427663741 0.0724676211418231 0.550589552982637"
@@ -283,7 +283,7 @@
     </collision>
   </link>
   <joint
-    name="ardrone1_joint"
+    name="drone1_joint"
     type="fixed">
     <origin
       xyz="1000 1000 0"
@@ -291,7 +291,7 @@
     <parent
       link="world" />
     <child
-      link="ardrone1_link" />
+      link="drone1_link" />
     <axis
       xyz="0 0 0" />
     <safety_controller
@@ -299,7 +299,7 @@
   </joint>
 
   <link
-    name="ardrone2_link">
+    name="drone2_link">
     <inertial>
       <origin
         xyz="0.014599427663741 0.0724676211418231 0.550589552982637"
@@ -341,7 +341,7 @@
     </collision>
   </link>
   <joint
-    name="ardrone2_joint"
+    name="drone2_joint"
     type="fixed">
     <origin
       xyz="1000 1000 0"
@@ -349,7 +349,7 @@
     <parent
       link="world" />
     <child
-      link="ardrone2_link" />
+      link="drone2_link" />
     <axis
       xyz="0 0 0" />
     <safety_controller
@@ -360,7 +360,7 @@
 
 
   <link
-    name="person0_link">
+    name="robot0_link">
     <inertial>
       <origin
         xyz="0.014599427663741 0.0724676211418231 0.550589552982637"
@@ -402,7 +402,7 @@
     </collision>
   </link>
   <joint
-    name="person0_joint"
+    name="robot0_joint"
     type="fixed">
     <origin
       xyz="1000 1000 0"
@@ -410,7 +410,7 @@
     <parent
       link="world" />
     <child
-      link="person0_link" />
+      link="robot0_link" />
     <axis
       xyz="0 0 0" />
     <safety_controller
@@ -418,7 +418,7 @@
   </joint>
 
    <link
-    name="person1_link">
+    name="robot1_link">
     <inertial>
       <origin
         xyz="0.014599427663741 0.0724676211418231 0.550589552982637"
@@ -460,7 +460,7 @@
     </collision>
   </link>
   <joint
-    name="person1_joint"
+    name="robot1_joint"
     type="fixed">
     <origin
       xyz="1000 1000 0"
@@ -468,7 +468,7 @@
     <parent
       link="world" />
     <child
-      link="person1_link" />
+      link="robot1_link" />
     <axis
       xyz="0 0 0" />
     <safety_controller
@@ -476,7 +476,7 @@
   </joint>
 
    <link
-    name="person2_link">
+    name="robot2_link">
     <inertial>
       <origin
         xyz="0.014599427663741 0.0724676211418231 0.550589552982637"
@@ -518,7 +518,7 @@
     </collision>
   </link>
   <joint
-    name="person2_joint"
+    name="robot2_joint"
     type="fixed">
     <origin
       xyz="1000 1000 0"
@@ -526,7 +526,7 @@
     <parent
       link="world" />
     <child
-      link="person2_link" />
+      link="robot2_link" />
     <axis
       xyz="0 0 0" />
     <safety_controller

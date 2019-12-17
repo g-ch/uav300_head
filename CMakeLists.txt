@@ -9,11 +9,20 @@ find_package(catkin REQUIRED COMPONENTS
 	tf
 	)
 
+find_package(OpenCV REQUIRED)
+
 catkin_package()
 
 include_directories(
-  ${catkin_INCLUDE_DIRS}  
+  ${catkin_INCLUDE_DIRS}
+	"../../devel/include"
 )
+
+
+find_package(Eigen3 REQUIRED)
+include_directories(${EIGEN3_INCLUDE_DIR})
+add_definitions(${EIGEN_DEFINITIONS})
+include_directories(${OpenCV_INCLUDE_DIRS})
 
 find_package(roslaunch)
 
@@ -22,5 +31,5 @@ foreach(dir config launch meshes urdf)
 		DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/${dir})
 endforeach(dir)
 
-add_executable(tf_broadcaster src/tf_broadcast.cpp)
-target_link_libraries(tf_broadcaster ${catkin_LIBRARIES})
+add_executable(broadcast_and_show src/broadcast_and_show.cpp)
+target_link_libraries(broadcast_and_show ${catkin_LIBRARIES} ${OpenCV_LIBS})
