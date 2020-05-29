@@ -9,6 +9,10 @@
 #include <iostream>
 #include <Eigen/Eigen>
 #include <opencv2/opencv.hpp>
+#include <nav_msgs/Path.h>
+#include <vector>
+
+#define PI_2 1.57
 
 std::map<std::string, int> rviz_objects_max_num;
 ros::Publisher marker_pub;
@@ -40,10 +44,18 @@ void dataCallback(const wifi_transmitter::Display &msg){
     p0(1) = -msg.local_pose.position.x;
     p0(2) = msg.local_pose.position.z;
 
-    quad.x() = msg.local_pose.orientation.y;
-    quad.y() = -msg.local_pose.orientation.x;
+    quad.x() = msg.local_pose.orientation.x;
+    quad.y() = msg.local_pose.orientation.y;
     quad.z() = msg.local_pose.orientation.z;
     quad.w() = msg.local_pose.orientation.w;
+
+    Eigen::Quaternionf q1(0, 0, 0, 1);
+    Eigen::Quaternionf axis = quad * q1 * quad.inverse();
+    axis.w() = cos(-PI_2/2.0);
+    axis.x() = axis.x() * sin(-PI_2/2.0);
+    axis.y() = axis.y() * sin(-PI_2/2.0);
+    axis.z() = axis.z() * sin(-PI_2/2.0);
+    quad = quad * axis;
 
     transform_ros.setOrigin( tf::Vector3(p0(0), p0(1), p0(2)));
     transform_ros.setRotation( tf::Quaternion(quad.x(), quad.y(), quad.z(), quad.w()) );
@@ -53,30 +65,19 @@ void dataCallback(const wifi_transmitter::Display &msg){
     static bool init_time = true;
     static double init_head_yaw = 0.0;
 
-//    if(init_time)
-//    {
-//        init_head_yaw = msg.vel_info.x;
-//        init_time = false;
-//        ROS_INFO("Head Init objectYaw in motor coordinate=%f", init_head_yaw);
-//    }
-//    else
-//    {
-//        motor_yaw = -msg.vel_info.x + init_head_yaw - 3.1415926 / 2; // + PI_2?? //start with zero, original z for motor is down. now turn to ENU coordinate. Head forward is PI/2 ???????????
-        motor_yaw = msg.vel_info.x - 3.1415926 / 2;
+    motor_yaw = msg.vel_info.x; // - 3.1415926 / 2;
 
-//        ROS_INFO("msg.vel_info.x=%f, motor_yaw=%f", msg.vel_info.x, motor_yaw);
+    Eigen::AngleAxisd rollAngle(Eigen::AngleAxisd(0,Eigen::Vector3d::UnitX())); //roll
+    Eigen::AngleAxisd pitchAngle(Eigen::AngleAxisd(0,Eigen::Vector3d::UnitY())); //pitch
+    Eigen::AngleAxisd yawAngle(Eigen::AngleAxisd(motor_yaw,Eigen::Vector3d::UnitZ())); //yaw
 
-        Eigen::AngleAxisd rollAngle(Eigen::AngleAxisd(0,Eigen::Vector3d::UnitX())); //roll
-        Eigen::AngleAxisd pitchAngle(Eigen::AngleAxisd(0,Eigen::Vector3d::UnitY())); //pitch
-        Eigen::AngleAxisd yawAngle(Eigen::AngleAxisd(motor_yaw,Eigen::Vector3d::UnitZ())); //yaw
+    Eigen::Quaterniond quaternion;
+    quaternion=yawAngle*pitchAngle*rollAngle;
 
-        Eigen::Quaterniond quaternion;
-        quaternion=yawAngle*pitchAngle*rollAngle;
+    transform_ros.setOrigin( tf::Vector3(0,0,0));
+    transform_ros.setRotation( tf::Quaternion(quaternion.x(), quaternion.y(), quaternion.z(), quaternion.w()) );
+    br_ros.sendTransform(tf::StampedTransform(transform_ros, ros::Time::now(), "uav_link", "head_link"));
 
-        transform_ros.setOrigin( tf::Vector3(0,0,0));
-        transform_ros.setRotation( tf::Quaternion(quaternion.x(), quaternion.y(), quaternion.z(), quaternion.w()) );
-        br_ros.sendTransform(tf::StampedTransform(transform_ros, ros::Time::now(), "uav_link", "head_link"));
-//    }
 
     /** Objects *
     * Publish tf to show in rviz.  Rviz_objects_max_num is the number of objects in urdf file for rviz **/
@@ -95,7 +96,7 @@ void dataCallback(const wifi_transmitter::Display &msg){
                 rviz_object_counter[object_i.label] = 0;
             }
 
-            transform_ros.setOrigin( tf::Vector3(object_i.position.x, object_i.position.y, object_i.position.z));
+            transform_ros.setOrigin( tf::Vector3(object_i.position.x, object_i.position.y, 0.2));
             transform_ros.setRotation( tf::Quaternion(0, 0, 0, 1) );
             br_ros.sendTransform(tf::StampedTransform(transform_ros, ros::Time::now(), "world", object_i.label+std::to_string(rviz_object_counter[object_i.label])+"_link"));
         }
@@ -120,9 +121,34 @@ void dataCallback(const wifi_transmitter::Display &msg){
     }
 
     /** Path Markers **/
-    visualization_msgs::Marker path_markers;
-    path_markers = msg.makers;
-    marker_pub.publish(path_markers);
+//    visualization_msgs::Marker path_markers;
+//    path_markers = msg.makers;
+//    marker_pub.publish(path_markers);
+
+    nav_msgs::Path uav_path;
+    uav_path.header.stamp=ros::Time::now();
+    uav_path.header.frame_id="world";
+
+    geometry_msgs::PoseStamped this_pose_stamped;
+    this_pose_stamped.pose.position.x = p0(0);
+    this_pose_stamped.pose.position.y = p0(1);
+    this_pose_stamped.pose.position.z = p0(2);
+    this_pose_stamped.pose.orientation.x = quad.x();
+    this_pose_stamped.pose.orientation.y = quad.y();
+    this_pose_stamped.pose.orientation.z = quad.z();
+    this_pose_stamped.pose.orientation.w = quad.w();
+
+    this_pose_stamped.header.stamp=ros::Time::now();;
+    this_pose_stamped.header.frame_id="world";
+
+    uav_path.poses.push_back(this_pose_stamped);
+
+    if(uav_path.poses.size() > 10)  //number of the markers to show is 10
+    {
+        uav_path.poses.erase(uav_path.poses.begin());
+    }
+
+    marker_pub.publish(uav_path);
 
     /*** Cost panels and detection time***/
     std::map<std::string, std::vector<double>> painting_data_map;
@@ -131,6 +157,7 @@ void dataCallback(const wifi_transmitter::Display &msg){
     painting_data_map["costHeadDirection"]=msg.cost_head_direction.data;
     painting_data_map["costHeadFluctuation"]=msg.cost_head_fluctuation.data;
     painting_data_map["costHeadFinal"]=msg.cost_head_final.data;
+    painting_data_map["costHeadUpdate"]=msg.cost_head_update.data;
 
     int rows = 480;  // y
     int cols = 700;  // x
@@ -194,8 +221,8 @@ void dataCallback(const wifi_transmitter::Display &msg){
         }
     }
 
-    cv::Point detection_time_place = cv::Point(cols - 200, rows - 100);
-    cv::Point detection_time_num_place = cv::Point(cols - 200, rows - 70);
+    cv::Point detection_time_place = cv::Point(100, rows - 20);
+    cv::Point detection_time_num_place = cv::Point(380, rows - 20);
 
     std::string detection_time = std::to_string(msg.detection_time.data) + " s";
     cv::putText(background, "detection time", detection_time_place, CV_FONT_HERSHEY_PLAIN, 1.2, cv::Scalar(0, 0, 255));
@@ -213,7 +240,8 @@ int main(int argc, char** argv){
     rviz_objects_max_num["drone"] = 3;
 
     ros::Subscriber data_sub = nh.subscribe("/Display/transfered",1,dataCallback);
-    marker_pub = nh.advertise<visualization_msgs::Marker>("/current_path", 1);
+//    marker_pub = nh.advertise<visualization_msgs::Marker>("/current_path", 1);
+    marker_pub = nh.advertise<nav_msgs::Path>("/uav_path",1, true);
 
     ros::Rate rate(20.0);
     ros::spin();
