@@ -33,3 +33,6 @@ endforeach(dir)
 
 add_executable(broadcast_and_show src/broadcast_and_show.cpp)
 target_link_libraries(broadcast_and_show ${catkin_LIBRARIES} ${OpenCV_LIBS})
+
+add_executable(showlocally src/showlocally.cpp)
+target_link_libraries(showlocally ${catkin_LIBRARIES} ${OpenCV_LIBS})
