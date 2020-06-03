@@ -11,11 +11,13 @@
 #include <opencv2/opencv.hpp>
 #include <nav_msgs/Path.h>
 #include <vector>
+#include <sensor_msgs/PointCloud2.h>
+#include "map_recolor.h"
 
 #define PI_2 1.57
 
 std::map<std::string, int> rviz_objects_max_num;
-ros::Publisher marker_pub;
+ros::Publisher marker_pub, pcl_pub, target_pub;
 
 void rotateVector(cv::Point &center, cv::Point &start_point, float angle, cv::Point &end_point)
 {
@@ -71,11 +73,11 @@ void dataCallback(const wifi_transmitter::Display &msg){
     Eigen::AngleAxisd pitchAngle(Eigen::AngleAxisd(0,Eigen::Vector3d::UnitY())); //pitch
     Eigen::AngleAxisd yawAngle(Eigen::AngleAxisd(motor_yaw,Eigen::Vector3d::UnitZ())); //yaw
 
-    Eigen::Quaterniond quaternion;
-    quaternion=yawAngle*pitchAngle*rollAngle;
+    Eigen::Quaterniond head_quaternion;
+    head_quaternion=yawAngle*pitchAngle*rollAngle;
 
     transform_ros.setOrigin( tf::Vector3(0,0,0));
-    transform_ros.setRotation( tf::Quaternion(quaternion.x(), quaternion.y(), quaternion.z(), quaternion.w()) );
+    transform_ros.setRotation( tf::Quaternion(head_quaternion.x(), head_quaternion.y(), head_quaternion.z(), head_quaternion.w()) );
     br_ros.sendTransform(tf::StampedTransform(transform_ros, ros::Time::now(), "uav_link", "head_link"));
 
 
@@ -121,11 +123,11 @@ void dataCallback(const wifi_transmitter::Display &msg){
     }
 
     /** Path Markers **/
-//    visualization_msgs::Marker path_markers;
-//    path_markers = msg.makers;
-//    marker_pub.publish(path_markers);
+    visualization_msgs::Marker path_markers;
+    path_markers = msg.makers;
+    target_pub.publish(path_markers);
 
-    nav_msgs::Path uav_path;
+    static nav_msgs::Path uav_path;
     uav_path.header.stamp=ros::Time::now();
     uav_path.header.frame_id="world";
 
@@ -133,22 +135,23 @@ void dataCallback(const wifi_transmitter::Display &msg){
     this_pose_stamped.pose.position.x = p0(0);
     this_pose_stamped.pose.position.y = p0(1);
     this_pose_stamped.pose.position.z = p0(2);
-    this_pose_stamped.pose.orientation.x = quad.x();
-    this_pose_stamped.pose.orientation.y = quad.y();
-    this_pose_stamped.pose.orientation.z = quad.z();
-    this_pose_stamped.pose.orientation.w = quad.w();
+    this_pose_stamped.pose.orientation.x = head_quaternion.x();
+    this_pose_stamped.pose.orientation.y = head_quaternion.y();
+    this_pose_stamped.pose.orientation.z = head_quaternion.z();
+    this_pose_stamped.pose.orientation.w = head_quaternion.w();
 
     this_pose_stamped.header.stamp=ros::Time::now();;
     this_pose_stamped.header.frame_id="world";
 
     uav_path.poses.push_back(this_pose_stamped);
 
-    if(uav_path.poses.size() > 10)  //number of the markers to show is 10
+    if(uav_path.poses.size() > 15)  //number of the markers to show is 15
     {
         uav_path.poses.erase(uav_path.poses.begin());
     }
 
     marker_pub.publish(uav_path);
+
 
     /*** Cost panels and detection time***/
     std::map<std::string, std::vector<double>> painting_data_map;
@@ -232,6 +235,22 @@ void dataCallback(const wifi_transmitter::Display &msg){
     cv::waitKey(1);
 }
 
+
+void cloudCallback(const sensor_msgs::PointCloud2ConstPtr& cloud){
+    // convert cloud to pcl form
+    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_in(new pcl::PointCloud<pcl::PointXYZ>());
+    pcl::fromROSMsg(*cloud, *cloud_in);
+
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_recolored(new pcl::PointCloud<pcl::PointXYZRGB>());
+    mapRecolor(cloud_in, cloud_recolored, 0.3, 3.0);
+
+    sensor_msgs::PointCloud2 output;
+    pcl::toROSMsg(*cloud_recolored, output);
+    output.header.frame_id = "world";
+    pcl_pub.publish(output);
+}
+
+
 int main(int argc, char** argv){
     ros::init(argc, argv, "tf_broadcaster");
     ros::NodeHandle nh;
@@ -240,8 +259,11 @@ int main(int argc, char** argv){
     rviz_objects_max_num["drone"] = 3;
 
     ros::Subscriber data_sub = nh.subscribe("/Display/transfered",1,dataCallback);
-//    marker_pub = nh.advertise<visualization_msgs::Marker>("/current_path", 1);
+    ros::Subscriber cloud_sub = nh.subscribe("/ring_buffer/cloud_ob/transfered",1,cloudCallback);
+
+    target_pub = nh.advertise<visualization_msgs::Marker>("/current_path", 1);
     marker_pub = nh.advertise<nav_msgs::Path>("/uav_path",1, true);
+    pcl_pub = nh.advertise<sensor_msgs::PointCloud2>("/recolored_map", 1, true);
 
     ros::Rate rate(20.0);
     ros::spin();

@@ -10,12 +10,15 @@ find_package(catkin REQUIRED COMPONENTS
 	)
 
 find_package(OpenCV REQUIRED)
-
+find_package(PCL REQUIRED)
+add_definitions(${PCL_DEFINITIONS})
 catkin_package()
 
 include_directories(
+  ${PCL_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
-	"../../devel/include"
+  "../../devel/include"
+  "include"
 )
 
 
@@ -32,7 +35,7 @@ foreach(dir config launch meshes urdf)
 endforeach(dir)
 
 add_executable(broadcast_and_show src/broadcast_and_show.cpp)
-target_link_libraries(broadcast_and_show ${catkin_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries(broadcast_and_show ${catkin_LIBRARIES} ${OpenCV_LIBS} ${PCL_LIBRARIES})
 
 add_executable(showlocally src/showlocally.cpp)
-target_link_libraries(showlocally ${catkin_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries(showlocally ${catkin_LIBRARIES} ${OpenCV_LIBS} ${PCL_LIBRARIES})

@@ -10,8 +10,11 @@
 #include <Eigen/Eigen>
 #include <opencv2/opencv.hpp>
 
+#include <sensor_msgs/PointCloud2.h>
+#include "map_recolor.h"
+
 std::map<std::string, int> rviz_objects_max_num;
-ros::Publisher marker_pub;
+ros::Publisher marker_pub, pcl_pub;
 
 wifi_transmitter::Display display_msg;
 bool updated_flag = false;
@@ -256,7 +259,19 @@ void show(const ros::TimerEvent& e){
     cv::waitKey(1);
 }
 
+void cloudCallback(const sensor_msgs::PointCloud2ConstPtr& cloud){
+    // convert cloud to pcl form
+    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_in(new pcl::PointCloud<pcl::PointXYZ>());
+    pcl::fromROSMsg(*cloud, *cloud_in);
 
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_recolored(new pcl::PointCloud<pcl::PointXYZRGB>());
+    mapRecolor(cloud_in, cloud_recolored, 0.3, 3.0);
+
+    sensor_msgs::PointCloud2 output;
+    pcl::toROSMsg(*cloud_recolored, output);
+    output.header.frame_id = "world";
+    pcl_pub.publish(output);
+}
 
 
 int main(int argc, char** argv){
@@ -279,6 +294,9 @@ int main(int argc, char** argv){
     ros::Subscriber cost_head_fluctuation_sub = ros_nh.subscribe("/head_cost/cost_head_fluctuation", 2, costHeadFluctuationCallback);
     ros::Subscriber cost_head_final_sub = ros_nh.subscribe("/head_cost/cost_head_final", 2, costHeadFinalCallback);
     ros::Subscriber cost_head_update_sub = ros_nh.subscribe("/head_cost/cost_head_update", 2, costHeadUpdateCallback);
+
+    ros::Subscriber cloud_sub = ros_nh.subscribe("/ring_buffer/cloud_ob",1,cloudCallback);
+    pcl_pub = ros_nh.advertise<sensor_msgs::PointCloud2>("/recolored_map", 1, true);
 
     ros::Timer timer1 = ros_nh.createTimer(ros::Duration(0.2), show); // RATE 3 Hz to publish
 
