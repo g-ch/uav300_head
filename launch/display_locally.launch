@@ -6,7 +6,7 @@
     default="False" />
   <param
     name="robot_description"
-    textfile="$(find uav300_head)/urdf/uav300_head.urdf" />
+    textfile="$(find uav300_head)/urdf/uav300_head_pure.urdf" />
   <param
     name="use_gui"
     value="$(arg gui)" />
@@ -17,7 +17,7 @@
   <node
     name="robot_state_publisher"
     pkg="robot_state_publisher"
-    type="state_publisher" />
+    type="robot_state_publisher" />
   <node
     name="rviz"
     pkg="rviz"
@@ -25,9 +25,9 @@
     args="-d $(find uav300_head)/local.rviz" />
     
   <node
-    name="showlocally"
+    name="local_msg_show"
     pkg="uav300_head"
-    type="showlocally"
+    type="local_msg_show"
     output="screen"/>
     
 </launch>
